@@ -30,7 +30,7 @@ def admin_required(func):
     def inner(*args, **kwargs):
         if current_user.is_admin():
             return func(*args, **kwargs)
-        else:
+        elif current_user:
             flash('You can\'t do that!')
             return redirect(request.referrer or '/')
     return inner
