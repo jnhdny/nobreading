@@ -8,7 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property, Comparator, hybrid_method
 from sqlalchemy import func
 from contextlib import closing
 import sys
-import sqlite3
+#import sqlite3
 from collections import namedtuple
 from forms import *
 import os
