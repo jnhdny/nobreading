@@ -32,7 +32,10 @@ def admin_required(func):
             return func(*args, **kwargs)
         elif current_user.is_authenticated():
             flash('You can\'t do that!')
-            return redirect(request.referrer or '/')
+            if request.referrer and 'login' not in request.referrer:
+                return redirect(request.referrer)
+            else:
+                return redirect('/')
         else:
             return func(*args, **kwargs)
     return inner
@@ -126,13 +129,14 @@ def teardown_request(exception):
     pass
 
 @app.route('/')
-#@login_required
 def index():
     return render_template('home.html')
 
 @app.route('/login', methods=["POST", "GET"])
 def login(next=None):
     error = None
+    if current_user.is_authenticated():
+        return redirect(url_for('index'))
     if request.method == "GET":
         return render_template('login.html')
     username = request.form['username']
