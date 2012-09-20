@@ -137,6 +137,7 @@ def login(next=None):
         return render_template('login.html')
     username = request.form['username']
     password = request.form['password']
+    jumpurl = request.form['next']
     if authenticate(username, password):
         if not DBUser.query.filter(DBUser.username == username).first():
             db.session.add(DBUser(username, password))
@@ -144,9 +145,7 @@ def login(next=None):
         u = User(username)
         if login_user(u):
             flash("Logged in successfully!")
-            if next:
-                return redirect(next)
-            return redirect(url_for('index'))
+            return redirect(jumpurl or url_for('index'))
     else:
         error = 'Incorrect username/password!'
         return render_template('login.html', error=error)
