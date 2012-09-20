@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang=en>
+    <head>
+        {% block head %}
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel='stylesheet'>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+            <h1>Request System</h1>
+            {% block menu %}
+            <div class="row">
+                <div class="span12">
+                    <ul class="nav nav-tabs">
+                        <li class="dropdown">
+                            <a href="/">Home</a>
+                        </li>
+                        <!--
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Requests<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                {% if current_user.is_admin() %}<li><a href="#">Show Open Requests</a></li>{% endif %}
+                                <li><a href="#">Request Equipment</a></li>
+                            </ul>
+                        </li>
+                        -->
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Equipment<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                {% if current_user.is_admin() %}<li><a href="{{ url_for('additem') }}">Add Equipment</a></li>{% endif %}
+                                <!-- {% if current_user.is_admin() %}<li><a href="#">Add Untagged Item</a></li>{% endif %} -->
+                                <li><a href="{{ url_for('showitems') }}">Show All Equipment</a></li>
+                            </ul>
+                        </li>
+                        {% if current_user.is_admin() %}
+                        <li class="dropdown">
+                            <a href="/categories">Categories</a>
+                        </li>
+                        {% endif %}
+                        {% if not current_user.is_authenticated() %}
+                        <li class="pull-right">
+                            <a href="/login">Login</a>
+                        </li>
+                        {% else %}
+                            <li class="dropdown pull-right">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Logged in as {{ current_user.username }} <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/account">My account</a></li>
+                                    <li><a href="/logout">Logout</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endblock %}
+            <div class="row">
+                <div class=span12>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert fade in">
+                                    <button type=button class="close" data-dismiss="alert">x</button>
+                                    {{ message }}
+                                </div>
+                               {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="span12">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

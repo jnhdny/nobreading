@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <title>Category: {{ category.name }}</title>
+{% endblock %}
+
+{% block body %}
+<h3>Category: {{ category.name }}</h3>
+
+{% if category.items %}
+<table class="table table-hover">
+    <tr>
+        <th>USAID Tag</th>
+        <th>Model</th>
+        {% if current_user.is_admin() %}
+        <th></th>
+        {% endif %}
+    </tr>
+    {% for item in category.items %}
+    <tr>
+        <td>{{ item.tagno }}</td>
+        <td> {{ item.model }}</td>
+        {% if current_user.is_admin() %}
+        <td><a href="/edititem/{{ item.id }}">Edit</a> | <a href="/deletecategory/{{ item.id }}">Delete</a></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>Sorry, there are no items!</p>
+{% endif %}
+<a href="/additem">Add New Item</a>
+{% endblock %}

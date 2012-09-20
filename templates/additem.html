@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <title>Add Item</title>
+{% endblock %}
+
+{% block body %}
+<form action="{{ url_for('additem') }}" method=POST>
+    <legend>Add Item</legend>
+    {% if error %}
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            {{ error }}
+        </div>
+    {% endif %}
+    <label>Tag number</label>
+    <input type=text name="tagno"></input>
+    <label class=select>Category</label>
+    <select name="category">
+        {% for c in form.category.choices %}
+            <option value={{ c[0] }}>{{ c[1] }}</option>
+        {% endfor %}
+    </select>
+    <label>Model</label>
+    <input type=text name="model"></input>
+    <label></label>
+    <button type="submit" class="btn">Add</button>
+</form>
+{% endblock %}    

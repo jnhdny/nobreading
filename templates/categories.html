@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <title>Categories</title>
+{% endblock %}
+
+{% block body %}
+<h3>Categories</h3>
+
+{% if categories %}
+<table class="table table-hover">
+    <tr>
+        <th>Name</th>
+        {% if current_user.is_admin() %}
+        <th></th>
+        {% endif %}
+    </tr>
+    {% for item in categories %}
+    <tr>
+        <td><a href="/category/{{ item.name }}">{{ item.name }}</a></td>
+        {% if current_user.is_admin() %}
+        <td><a href="#"{{ item.id }}">Edit</a> | <a href="/deletecategory/{{ item.id }}">Delete</a></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>Sorry, there are no items!</p>
+{% endif %}
+<a href="/addcategory">Add New Category</a>
+{% endblock %}
+

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <title>All Items</title>
+{% endblock %}
+
+{% block body %}
+<h3>All Items</h3>
+
+{% if items %}
+<table class="table table-hover">
+    <tr>
+        <th>USAID tag</th>
+        <th>Category</th>
+        <th>Model</th>
+        {% if current_user.is_admin() %}
+        <th></th>
+        {% endif %}
+    </tr>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.tagno }}</td>
+        <td>{{ item.category.name }}</td>
+        <td>{{ item.model }}</td>
+        {% if current_user.is_admin() %}
+        <td><a href="/edititem/{{ item.id }}">Edit</a> | <a href="/deleteitem/{{ item.id }}">Delete</a></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>Sorry, there are no items!</p>
+{% endif %}
+{% if current_user.is_admin() %}
+<a href="{{ url_for('additem') }}">Add New Equipment</a>
+{% endif %}
+{% endblock %}

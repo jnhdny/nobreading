@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <title>Login Form</title>
+{% endblock %}
+{% block menu %}
+{% endblock %}
+{% block body %}
+    <form action="/login" method=POST class="form-horizontal">
+        <legend>Login</legend>
+        {% if error %}
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            {{ error }}
+        </div>
+        {% endif %}
+        <div class="control-group">
+            <label class="control-label">Username:</label>
+            <div class="controls">
+                <input type=text placeholder="Enter username..." name=username>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Password:</label>
+            <div class="controls">
+                <input type=password name=password>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn">Login</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
