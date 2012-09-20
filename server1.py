@@ -33,6 +33,8 @@ def admin_required(func):
         elif current_user.is_authenticated():
             flash('You can\'t do that!')
             return redirect(request.referrer or '/')
+        else:
+            return func(*args, **kwargs)
     return inner
             
 
