@@ -17,7 +17,7 @@ import os
 DEBUG = True
 SECRET_KEY = '7hfdbrt354dsfhddr<f9342nbds034qwnxck-=9833445.;":&&^psdarwer'
 ADMINS = ['admin']
-SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_COLOR_URL', 'postgresql://postgres:pptp@127.0.0.1')
+SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_GREEN_URL', 'postgresql://postgres:pptp@127.0.0.1')
 print SQLALCHEMY_DATABASE_URI
 app = Flask(__name__)
 app.config.from_object(__name__)
