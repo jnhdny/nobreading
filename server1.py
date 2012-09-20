@@ -8,7 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property, Comparator, hybrid_method
 from sqlalchemy import func
 from contextlib import closing
 import sys
-#import sqlite3
+
 from collections import namedtuple
 from forms import *
 import os
@@ -19,7 +19,6 @@ DEBUG = True
 SECRET_KEY = '7hfdbrt354dsfhddr<f9342nbds034qwnxck-=9833445.;":&&^psdarwer'
 ADMINS = ['admin']
 SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_GREEN_URL', 'postgresql://postgres:pptp@127.0.0.1')
-print SQLALCHEMY_DATABASE_URI
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
@@ -33,7 +32,7 @@ def admin_required(func):
             return func(*args, **kwargs)
         else:
             flash('You can\'t do that!')
-            return redirect('/')
+            return redirect(request.referrer or '/')
     return inner
             
 
@@ -170,7 +169,6 @@ def additem():
         form = AddEquipmentForm()
         form.category.choices = [(a.id, a.name) for a in DBCategory.query.all()]
         categories = DBCategory.query.order_by(DBCategory.name).all()
-        print form.category.choices
         return render_template('additem.html', form=form)
     else:
         tagno = request.form.get('tagno', None)
@@ -276,7 +274,6 @@ def addcategory():
 @app.route('/category/<catname>')
 def category(catname):
     cg = DBCategory.query.filter(DBCategory.lowername == catname).first()
-    print cg.items
     return render_template("category.html", category=cg)
 
 def initdb():
