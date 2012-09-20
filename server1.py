@@ -268,7 +268,7 @@ def category(catname):
 
 def initdb():
     # Destroy and recreate tables
-    db.drop_all()
+    # db.drop_all()
     db.create_all()  
     categories = ['Projector', 'Camera', 'Laptop', 'Modem', 'Printer']
     for c in categories:
