@@ -12,6 +12,7 @@ import sys
 from collections import namedtuple
 from forms import *
 import os
+from functools import wraps
 
 #DATABASE = 'C:/temp/prequest.db'
 DEBUG = True
@@ -24,6 +25,17 @@ app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 db = SQLAlchemy(app)
+
+def admin_required(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        if current_user.is_admin():
+            return func(*args, **kwargs)
+        else:
+            flash('You can\'t do that!')
+            return redirect('/')
+    return inner
+            
 
 class CIC(Comparator):
     def __eq__(self, other):
@@ -188,10 +200,11 @@ def additem():
 
 @app.route('/edititem/', methods=["POST"])
 @app.route('/edititem/<int:item_id>', methods=["GET", "POST"])
+@admin_required
 @login_required
 def edititem(item_id=None):
-    if not current_user.is_admin():
-        return redirect(url_for('showitems'))
+    #if not current_user.is_admin():
+    #    return redirect(url_for('showitems'))
     if request.method == "GET":
         item = DBEquipment.query.get(item_id)
         if not item:
