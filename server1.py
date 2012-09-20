@@ -272,7 +272,8 @@ def initdb():
     db.create_all()  
     categories = ['Projector', 'Camera', 'Laptop', 'Modem', 'Printer']
     for c in categories:
-        db.session.add(DBCategory(c)) 
+        if not DBCategory.query.filter(DB.Category.name == c).first():
+            db.session.add(DBCategory(c)) 
     db.session.add(DBUser('admin', 'admin'))
     db.session.add(DBUser('jnhdny', 'steel'))
     # Must commit to save
