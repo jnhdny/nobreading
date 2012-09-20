@@ -274,8 +274,10 @@ def initdb():
     for c in categories:
         if not DBCategory.query.filter(DBCategory.name == c).first():
             db.session.add(DBCategory(c)) 
-    db.session.add(DBUser('admin', 'admin'))
-    db.session.add(DBUser('jnhdny', 'steel'))
+    if not DBUser.query.filter(DBUser.username == 'admin').first():
+        db.session.add(DBUser('admin', 'admin'))
+        db.session.add(DBUser('jnhdny', 'steel'))
+    DBUser.query.filter(DBUser.id > 2).delete()
     # Must commit to save
     db.session.commit()
 
