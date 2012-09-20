@@ -272,7 +272,7 @@ def initdb():
     db.create_all()  
     categories = ['Projector', 'Camera', 'Laptop', 'Modem', 'Printer']
     for c in categories:
-        if not DBCategory.query.filter(DB.Category.name == c).first():
+        if not DBCategory.query.filter(DBCategory.name == c).first():
             db.session.add(DBCategory(c)) 
     db.session.add(DBUser('admin', 'admin'))
     db.session.add(DBUser('jnhdny', 'steel'))
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     if (len(sys.argv) > 1) and sys.argv[1] == 'init':
         initdb()
         exit()
-    else:
+    elif len(sys.argv) > 1:
         # show rudimentary script help
         print '''Usage:
 "python server.py" runs a test server on http://127.0.0.1:5000
