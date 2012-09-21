@@ -148,7 +148,8 @@ def login(next=None):
             db.session.commit()
         u = User(username)
         if login_user(u):
-            flash("Logged in successfully!")
+            if not jumpurl:
+                flash("Logged in successfully!")
             return redirect(jumpurl or url_for('index'))
     else:
         error = 'Incorrect username/password!'
@@ -281,9 +282,10 @@ def category(catname):
     cg = DBCategory.query.filter(DBCategory.lowername == catname).first()
     return render_template("category.html", category=cg)
 
-def initdb():
+def initdb(newinstance=False):
     # Destroy and recreate tables
-    # db.drop_all()
+    if newinstance:
+        db.drop_all()
     db.create_all()  
     categories = ['Projector', 'Camera', 'Laptop', 'Modem', 'Printer']
     for c in categories:
