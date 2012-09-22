@@ -8,6 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property, Comparator, hybrid_method
 from sqlalchemy import func
 from contextlib import closing
 import sys
+from datetime import datetime
 
 from collections import namedtuple
 from forms import *
@@ -78,16 +79,47 @@ class DBEquipment(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
 
 class DBUser(db.Model):
-    __tablename__='users'
+    __tablename__ = 'users'
     def __init__(self, username, password):
         self.username = username
         self.password = password
     def __repr__(self):
         return self.username
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String)
+    username = db.Column(db.String, unique=True)
     password = db.Column(db.String)
-    
+
+class DBEvent(db.Model):
+    __tablename__ = 'events'
+    def __init__(self, name, user):
+        self.name = name
+        self.creator_id = user.id
+    def add_requirement(self, category, quantity):
+        pass
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    description = db.Column(db.String)
+    start_date = db.Column(db.DateTime, default=func.now())
+    end_date = db.Column(db.DateTime, default=func.now())
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    creator = db.relationship('DBUser', backref='events', lazy='select')
+
+class DBRequirement(db.Model):
+    __tablename__ = 'requirements'
+    def __init__(self):
+        pass
+    id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.Integer, default=1)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    category = db.relationship('DBCategory')
+    event = db.relationship('DBEvent', backref='requirements', lazy='select')
+
+#class DBBooking(db.Model):
+#    __tablename__ = 'bookings'
+#    id = db.Column(db.Integer, primary_key=True)
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -139,18 +171,22 @@ def login(next=None):
         return redirect(url_for('index'))
     if request.method == "GET":
         return render_template('login.html')
-    username = request.form['username']
-    password = request.form['password']
-    jumpurl = request.form['next']
+    try:
+        username = request.form['username']
+        password = request.form['password']
+        jumpurl = request.form.get('next', '')
+    except:
+        error = 'Oops! Try again!'
+        return redirect(url_for('login'))
     if authenticate(username, password):
         if not DBUser.query.filter(DBUser.username == username).first():
             db.session.add(DBUser(username, password))
             db.session.commit()
         u = User(username)
-        if login_user(u):
-            if not jumpurl:
-                flash("Logged in successfully!")
-            return redirect(jumpurl or url_for('index'))
+        login_user(u)
+        if not jumpurl:
+            flash("Logged in successfully!")
+        return redirect(jumpurl or url_for('index'))
     else:
         error = 'Incorrect username/password!'
         return render_template('login.html', error=error)
@@ -282,6 +318,11 @@ def category(catname):
     cg = DBCategory.query.filter(DBCategory.lowername == catname).first()
     return render_template("category.html", category=cg)
 
+@app.route('/events')
+def events():
+    events = DBEvent.query.all()
+    return render_template('events.html', events=events)
+
 def initdb(newinstance=False):
     # Destroy and recreate tables
     if newinstance:
@@ -307,7 +348,7 @@ if __name__ == '__main__':
     
     # Initialize database by running python server.py init
     if (len(sys.argv) > 1) and sys.argv[1] == 'init':
-        initdb()
+        initdb(True)
         exit()
     elif len(sys.argv) > 1:
         # show rudimentary script help
