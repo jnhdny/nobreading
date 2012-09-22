@@ -15,6 +15,10 @@ from forms import *
 import os
 from functools import wraps
 
+import re
+from gzip import GzipFile
+from io import BytesIO
+
 #DATABASE = 'C:/temp/prequest.db'
 DEBUG = True
 SECRET_KEY = '7hfdbrt354dsfhddr<f9342nbds034qwnxck-=9833445.;":&&^psdarwer'
@@ -23,6 +27,73 @@ SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_GREEN_URL', 'postgre
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+re_accepts_gzip = re.compile(r'\bgzip\b')
+cc_delim_re = re.compile(r'\s*,\s*')
+
+def compress_string(s):
+    zbuf = BytesIO()
+    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
+    zfile.write(s)
+    zfile.close()
+    return zbuf.getvalue()
+
+def patch_vary_headers(response, newheaders):
+    """
+    Adds (or updates) the "Vary" header in the given HttpResponse object.
+    newheaders is a list of header names that should be in "Vary". Existing
+    headers in "Vary" aren't removed.
+    """
+    # Note that we need to keep the original order intact, because cache
+    # implementations may rely on the order of the Vary contents in, say,
+    # computing an MD5 hash.
+    if 'Vary' in response.headers:
+        vary_headers = cc_delim_re.split(response.headers['Vary'])
+    else:
+        vary_headers = []
+    # Use .lower() here so we treat headers as case-insensitive.
+    existing_headers = set([header.lower() for header in vary_headers])
+    additional_headers = [newheader for newheader in newheaders
+                          if newheader.lower() not in existing_headers]
+    response.headers['Vary'] = ', '.join(vary_headers + additional_headers)
+
+
+@app.after_request
+def process_response(response):
+    # Stolen and adapted from Django's GZip Middleware
+    # It's not worth attempting to compress really short responses.
+    if len(response.data) < 200:
+        return response
+
+    patch_vary_headers(response, ('Accept-Encoding',))
+
+    # Avoid gzipping if we've already got a content-encoding.
+    if 'Content-Encoding' in response.headers:
+        return response
+    
+    # MSIE have issues with gzipped response of various content types.
+    if "msie" in request.environ.get('HTTP_USER_AGENT', '').lower():
+        ctype = response.headers.get('Content-Type', '').lower()
+        if not ctype.startswith("text/") or "javascript" in ctype:
+            return response
+
+    ae = request.headers.get('ACCEPT_ENCODING', '')
+    if not re_accepts_gzip.search(ae):
+        return response
+
+    # Return the compressed content only if it's actually shorter.
+    compressed_content = compress_string(response.data)
+    if len(compressed_content) >= len(response.data):
+        return response
+
+    if 'ETag' in response.headers:
+        response.headers['ETag'] = re.sub('"$', ';gzip"', response.headers['ETag'])
+
+    response.data = compressed_content
+    response.headers['Content-Encoding'] = 'gzip'
+    response.headers['Content-Length'] = str(len(response.data))
+
+    return response
 
 db = SQLAlchemy(app)
 
