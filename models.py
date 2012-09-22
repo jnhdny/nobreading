@@ -4,7 +4,7 @@ from sqlalchemy import func
 
 from server import app
 
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 class CIC(Comparator):
     def __eq__(self, other):

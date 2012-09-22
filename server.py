@@ -26,6 +26,8 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
+db.init_app(app)
+
 re_accepts_gzip = re.compile(r'\bgzip\b')
 cc_delim_re = re.compile(r'\s*,\s*')
 
@@ -92,8 +94,6 @@ def process_response(response):
     response.headers['Content-Length'] = str(len(response.data))
 
     return response
-
-db = SQLAlchemy(app)
 
 def admin_required(func):
     @wraps(func)
