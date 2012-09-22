@@ -309,6 +309,8 @@ def events():
 
 def initdb(newinstance=False):
     # Destroy and recreate tables
+    ctx = app.test_request_context()
+    ctx.push()
     if newinstance:
         db.drop_all()
     db.create_all()  
@@ -322,6 +324,7 @@ def initdb(newinstance=False):
     DBUser.query.filter(DBUser.id > 2).delete()
     # Must commit to save
     db.session.commit()
+    ctx.pop()
 
 if __name__ == '__main__':
     # Run server if there are no arguments

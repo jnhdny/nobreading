@@ -2,8 +2,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator, hybrid_method
 from sqlalchemy import func
 
-from server import app
-
 db = SQLAlchemy()
 
 class CIC(Comparator):
