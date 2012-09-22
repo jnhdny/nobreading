@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <title>All Items</title>
+{% endblock %}
+
+{% block body %}
+<h3>All Events</h3>
+
+{% if events %}
+<table class="table table-hover">
+    <tr>
+        <th>Name</th>
+        <th>Booked by</th>
+        <th>Start Date</th>
+    </tr>
+    {% for event in events %}
+    <tr>
+        <td>{{ event.name }}</td>
+        <td>{{ event.creator.username }}</td>
+        <td>{{ event.start_date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>Sorry, there are no events!</p>
+{% endif %}
+
+{% endblock %}
