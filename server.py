@@ -1,4 +1,4 @@
-from models import *
+from models import db, DBUser, DBCategory, DBEquipment, DBEvent, DBRequirement
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 #from flask.ext.login import *
@@ -21,7 +21,7 @@ from io import BytesIO
 DEBUG = True
 SECRET_KEY = '7hfdbrt354dsfhddr<f9342nbds034qwnxck-=9833445.;":&&^psdarwer'
 ADMINS = ['admin']
-SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_GREEN_URL', 'postgresql://postgres:pptp@127.0.0.1')
+SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_MAROON_URL', 'postgresql://postgres:pptp@127.0.0.1')
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
@@ -60,7 +60,7 @@ def patch_vary_headers(response, newheaders):
 
 @app.after_request
 def process_response(response):
-    # Stolen and adapted from Django's GZip Middleware
+    # Stolen and adapted from Django's GZipMiddleware
     # It's not worth attempting to compress really short responses.
     if len(response.data) < 200:
         return response
@@ -329,7 +329,6 @@ def initdb(newinstance=False):
 if __name__ == '__main__':
     # Run server if there are no arguments
     if (len(sys.argv) == 1):
-        initdb()
         port = int(os.environ.get('PORT', 5000))
         app.run('0.0.0.0', port)
     
